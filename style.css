@@ -1,0 +1,443 @@
+/* =========================
+   BODY
+========================= */
+
+body{
+
+margin:0;
+padding:0;
+
+min-height:100vh;
+
+font-family:'Poppins',sans-serif;
+
+color:white;
+
+background:
+linear-gradient(
+135deg,
+#0f172a,
+#14213d,
+#1d3557
+);
+
+overflow-x:hidden;
+
+}
+
+/* =========================
+   MAIN CARD
+========================= */
+
+.main-card{
+
+width:100%;
+
+max-width:720px;
+
+margin:auto;
+
+margin-top:20px;
+
+padding:25px;
+
+border-radius:30px;
+
+background:
+rgba(255,255,255,0.08);
+
+backdrop-filter:blur(14px);
+
+border:
+1px solid rgba(255,255,255,0.1);
+
+box-shadow:
+0 8px 32px rgba(0,0,0,0.35);
+
+animation:fadeIn 0.6s ease;
+
+}
+
+/* =========================
+   TITLE
+========================= */
+
+.title{
+
+font-size:3rem;
+
+font-weight:700;
+
+letter-spacing:1px;
+
+}
+
+/* =========================
+   SEARCH INPUT
+========================= */
+
+.search-input{
+
+height:60px;
+
+font-size:1.3rem;
+
+border:none;
+
+outline:none;
+
+padding-left:18px;
+
+border-radius:15px 0 0 15px;
+
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
+.btn-primary{
+
+background:#2563eb !important;
+
+border:none !important;
+
+font-size:1.2rem;
+
+font-weight:500;
+
+}
+
+.btn-primary:hover{
+
+background:#1d4ed8 !important;
+
+}
+
+.btn-success{
+
+background:#16a34a !important;
+
+border:none !important;
+
+font-size:1.2rem;
+
+font-weight:500;
+
+}
+
+/* =========================
+   CURRENT WEATHER
+========================= */
+
+.current-weather{
+
+background:
+rgba(255,255,255,0.12);
+
+border-radius:25px;
+
+padding:30px;
+
+text-align:center;
+
+animation:fadeIn 0.6s ease;
+
+box-shadow:
+0 4px 20px rgba(0,0,0,0.2);
+
+}
+
+.current-weather h1{
+
+font-size:4rem;
+
+font-weight:700;
+
+margin-top:10px;
+
+}
+
+.current-weather h2{
+
+font-size:3rem;
+
+font-weight:600;
+
+}
+
+.current-weather h4{
+
+font-size:2.3rem;
+
+font-weight:600;
+
+margin-top:10px;
+
+}
+
+.current-weather p{
+
+font-size:1.2rem;
+
+opacity:0.9;
+
+}
+
+.current-weather img{
+
+width:130px;
+
+filter:
+drop-shadow(
+0 0 15px rgba(255,255,255,0.3)
+);
+
+}
+
+/* =========================
+   WEATHER DETAILS
+========================= */
+
+.weather-detail{
+
+margin-top:25px;
+
+}
+
+.weather-detail h6{
+
+font-size:1.2rem;
+
+font-weight:600;
+
+}
+
+.weather-detail p{
+
+font-size:1.5rem;
+
+}
+
+/* =========================
+   CHART
+========================= */
+
+.chart-container{
+
+background:
+rgba(255,255,255,0.10);
+
+border-radius:25px;
+
+padding:20px;
+
+height:380px;
+
+margin-top:25px;
+
+box-shadow:
+0 4px 20px rgba(0,0,0,0.2);
+
+animation:fadeIn 0.6s ease;
+
+}
+
+/* =========================
+   FORECAST CARDS
+========================= */
+
+.forecast-box{
+
+background:
+rgba(255,255,255,0.12);
+
+border-radius:25px;
+
+padding:20px;
+
+text-align:center;
+
+transition:0.3s;
+
+height:100%;
+
+box-shadow:
+0 4px 15px rgba(0,0,0,0.15);
+
+animation:fadeIn 0.6s ease;
+
+}
+
+.forecast-box:hover{
+
+transform:
+translateY(-5px);
+
+box-shadow:
+0 10px 25px rgba(0,0,0,0.3);
+
+}
+
+.forecast-box img{
+
+width:90px;
+
+}
+
+.forecast-box h2{
+
+font-size:3rem;
+
+font-weight:700;
+
+margin-top:10px;
+
+}
+
+.forecast-box p{
+
+font-size:1.2rem;
+
+opacity:0.9;
+
+}
+
+/* =========================
+   LOADER
+========================= */
+
+.loader{
+
+width:60px;
+
+height:60px;
+
+border:
+6px solid rgba(255,255,255,0.2);
+
+border-top:
+6px solid #00d2ff;
+
+border-radius:50%;
+
+animation:spin 1s linear infinite;
+
+margin:20px auto;
+
+}
+
+@keyframes spin{
+
+100%{
+transform:rotate(360deg);
+}
+
+}
+
+/* =========================
+   FOOTER
+========================= */
+
+.footer-text{
+
+opacity:0.7;
+
+font-size:18px;
+
+letter-spacing:0.5px;
+
+}
+
+/* =========================
+   ANIMATION
+========================= */
+
+@keyframes fadeIn{
+
+from{
+
+opacity:0;
+
+transform:translateY(10px);
+
+}
+
+to{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+}
+
+/* =========================
+   HIDE
+========================= */
+
+.d-none{
+
+display:none;
+
+}
+
+/* =========================
+   MOBILE
+========================= */
+
+@media(max-width:768px){
+
+.title{
+
+font-size:2.3rem;
+
+}
+
+.current-weather h1{
+
+font-size:3rem;
+
+}
+
+.current-weather h2{
+
+font-size:2.4rem;
+
+}
+
+.current-weather h4{
+
+font-size:2rem;
+
+}
+
+.forecast-box h2{
+
+font-size:2.5rem;
+
+}
+
+.chart-container{
+
+height:320px;
+
+}
+
+.search-input{
+
+font-size:1.1rem;
+
+height:55px;
+
+}
+
+.btn-primary,
+.btn-success{
+
+font-size:1rem;
+
+}
+
+}
