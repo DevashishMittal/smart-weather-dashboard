@@ -1,11 +1,36 @@
 // =========================
-// GLOBAL CHART
+// GLOBALS
 // =========================
 
 let myChart = null;
 
+const apiKey =
+"08e70d0da4c9958dad8d34d1718c5686";
+
 // =========================
-// MAIN WEATHER FUNCTION
+// LIVE CLOCK
+// =========================
+
+setInterval(()=>{
+
+document.getElementById("liveClock")
+.innerHTML =
+
+"🕒 " +
+
+new Date().toLocaleTimeString(
+'en-IN',
+{
+hour:'numeric',
+minute:'numeric',
+second:'numeric'
+}
+);
+
+},1000);
+
+// =========================
+// MAIN WEATHER
 // =========================
 
 async function getWeather(){
@@ -18,26 +43,15 @@ document
 
 if(city === ""){
 
-alert("Please enter city");
+alert("Enter city name");
 
 return;
 
 }
 
-// Loader Show
-
-document
-.getElementById("loader")
-.classList.remove("d-none");
-
-// API KEY
-
-const apiKey =
-"08e70d0da4c9958dad8d34d1718c5686";
+showLoader(true);
 
 try{
-
-// Fetch Forecast Data
 
 const response =
 await fetch(
@@ -49,13 +63,7 @@ await fetch(
 const data =
 await response.json();
 
-// Loader Hide
-
-document
-.getElementById("loader")
-.classList.add("d-none");
-
-// Error Handling
+showLoader(false);
 
 if(data.cod != "200"){
 
@@ -65,7 +73,8 @@ return;
 
 }
 
-// Daily Forecast
+const current =
+data.list[0];
 
 const daily =
 data.list.filter(item =>
@@ -74,10 +83,8 @@ item.dt_txt.includes("12:00:00")
 
 );
 
-// Show UI
-
 showCurrentWeather(
-data.list[0],
+current,
 data.city
 );
 
@@ -85,20 +92,51 @@ showForecast(daily);
 
 showChart(daily);
 
+showAlert(current);
+
+showAISuggestion(current);
+
+changeBackground(current);
+
+getAQI(
+data.city.coord.lat,
+data.city.coord.lon
+);
+
 saveSearch(city);
+
+loadHistory();
 
 }
 catch(error){
 
 console.log(error);
 
-alert("Error fetching weather");
+showLoader(false);
 
-// Loader Hide
+alert("Weather fetch failed");
 
-document
-.getElementById("loader")
-.classList.add("d-none");
+}
+
+}
+
+// =========================
+// LOADER
+// =========================
+
+function showLoader(status){
+
+const loader =
+document.getElementById("loader");
+
+if(status){
+
+loader.classList.remove("d-none");
+
+}
+else{
+
+loader.classList.add("d-none");
 
 }
 
@@ -113,33 +151,6 @@ function showCurrentWeather(day, cityData){
 const box =
 document.getElementById("weatherBox");
 
-// Weather Type
-
-let weatherMain =
-day.weather[0].main;
-
-// Dynamic Color
-
-let weatherColor = "#ffffff";
-
-if(weatherMain == "Clear"){
-weatherColor = "#FFD93D";
-}
-
-if(weatherMain == "Clouds"){
-weatherColor = "#D6E4F0";
-}
-
-if(weatherMain == "Rain"){
-weatherColor = "#4FC3F7";
-}
-
-if(weatherMain == "Thunderstorm"){
-weatherColor = "#FF6B6B";
-}
-
-// Sunrise
-
 const sunrise =
 new Date(cityData.sunrise * 1000)
 .toLocaleTimeString(
@@ -149,8 +160,6 @@ hour:'numeric',
 minute:'numeric'
 }
 );
-
-// Sunset
 
 const sunset =
 new Date(cityData.sunset * 1000)
@@ -166,11 +175,7 @@ box.innerHTML = `
 
 <div class="current-weather">
 
-<h2>
-
-${cityData.name}
-
-</h2>
+<h2>${cityData.name}</h2>
 
 <p>
 
@@ -189,26 +194,19 @@ minute:'numeric'
 </p>
 
 <img
-width="120"
 src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png"
 >
 
 <h1>
-
 ${Math.round(day.main.temp)}°C
-
 </h1>
 
-<h4 style="color:${weatherColor}">
-
+<h4>
 ${day.weather[0].main}
-
 </h4>
 
 <p>
-
 ${day.weather[0].description}
-
 </p>
 
 <div class="row mt-4">
@@ -294,7 +292,7 @@ ${day.weather[0].description}
 }
 
 // =========================
-// FORECAST CARDS
+// FORECAST
 // =========================
 
 function showForecast(days){
@@ -310,7 +308,7 @@ row.innerHTML += `
 
 <div class="col-6 col-md-4">
 
-<div class="forecast-box text-center">
+<div class="forecast-box">
 
 <h5>
 
@@ -326,20 +324,15 @@ day:'numeric'
 </h5>
 
 <img
-width="80"
 src="https://openweathermap.org/img/wn/${day.weather[0].icon}@2x.png"
 >
 
 <h2>
-
 ${Math.round(day.main.temp)}°C
-
 </h2>
 
 <p>
-
 ${day.weather[0].description}
-
 </p>
 
 </div>
@@ -353,7 +346,7 @@ ${day.weather[0].description}
 }
 
 // =========================
-// TEMPERATURE CHART
+// CHART
 // =========================
 
 function showChart(days){
@@ -361,8 +354,6 @@ function showChart(days){
 const ctx =
 document.getElementById("weatherChart")
 .getContext("2d");
-
-// Labels
 
 const labels =
 days.map(d =>
@@ -377,20 +368,14 @@ weekday:'short'
 
 );
 
-// Temps
-
 const temps =
 days.map(d => d.main.temp);
-
-// Destroy Old Chart
 
 if(myChart){
 
 myChart.destroy();
 
 }
-
-// Create Chart
 
 myChart = new Chart(ctx,{
 
@@ -411,15 +396,11 @@ borderColor:'#00d2ff',
 backgroundColor:
 'rgba(0,210,255,0.2)',
 
-borderWidth:4,
-
 fill:true,
 
 tension:0.4,
 
-pointBackgroundColor:'#ffffff',
-
-pointRadius:5
+borderWidth:4
 
 }]
 
@@ -429,53 +410,7 @@ options:{
 
 responsive:true,
 
-maintainAspectRatio:false,
-
-plugins:{
-
-legend:{
-
-labels:{
-
-color:'white',
-
-font:{
-size:16
-}
-
-}
-
-}
-
-},
-
-scales:{
-
-x:{
-
-ticks:{
-color:'white'
-},
-
-grid:{
-color:'rgba(255,255,255,0.08)'
-}
-
-},
-
-y:{
-
-ticks:{
-color:'white'
-},
-
-grid:{
-color:'rgba(255,255,255,0.08)'
-}
-
-}
-
-}
+maintainAspectRatio:false
 
 }
 
@@ -484,55 +419,173 @@ color:'rgba(255,255,255,0.08)'
 }
 
 // =========================
-// GEOLOCATION WEATHER
+// ALERTS
 // =========================
 
-function getLocationWeather(){
+function showAlert(day){
 
-navigator.geolocation
-.getCurrentPosition(
+const box =
+document.getElementById("alertBox");
 
-async(position)=>{
+let msg = "";
 
-const lat =
-position.coords.latitude;
+if(day.main.temp > 40){
 
-const lon =
-position.coords.longitude;
+msg =
+"🔥 Heatwave Alert";
 
-const apiKey =
-"08e70d0da4c9958dad8d34d1718c5686";
+}
+else if(day.weather[0].main === "Rain"){
 
-// Current Weather
+msg =
+"🌧 Rain Expected";
+
+}
+else if(day.weather[0].main === "Thunderstorm"){
+
+msg =
+"⛈ Thunderstorm Warning";
+
+}
+else{
+
+msg =
+"✅ Weather Normal";
+
+}
+
+box.style.display = "block";
+
+box.innerHTML = msg;
+
+}
+
+// =========================
+// AI SUGGESTION
+// =========================
+
+function showAISuggestion(day){
+
+const aiBox =
+document.getElementById("aiBox");
+
+let text = "";
+
+if(day.main.temp > 38){
+
+text =
+"🥤 Drink more water and avoid afternoon heat.";
+
+}
+else if(day.weather[0].main === "Rain"){
+
+text =
+"☔ Carry umbrella before going outside.";
+
+}
+else if(day.weather[0].main === "Clear"){
+
+text =
+"🌤 Great weather for outdoor activities.";
+
+}
+else{
+
+text =
+"😊 Comfortable weather today.";
+
+}
+
+aiBox.innerHTML = `
+
+<div class="alert alert-info">
+
+${text}
+
+</div>
+
+`;
+
+}
+
+// =========================
+// AQI
+// =========================
+
+async function getAQI(lat, lon){
+
+try{
 
 const response =
 await fetch(
 
-`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+`https://api.openweathermap.org/data/2.5/air_pollution?lat=${lat}&lon=${lon}&appid=${apiKey}`
 
 );
 
 const data =
 await response.json();
 
-// Set City
+const aqi =
+data.list[0].main.aqi;
 
-document
-.getElementById("cityInput")
-.value = data.name;
+let text = "";
 
-// Fetch Full Forecast
+if(aqi === 1) text = "Good 😊";
+if(aqi === 2) text = "Fair 🙂";
+if(aqi === 3) text = "Moderate 😐";
+if(aqi === 4) text = "Poor 😷";
+if(aqi === 5) text = "Very Poor ☠";
 
-getWeather();
+document.getElementById("aqi")
+.innerText = text;
 
 }
+catch(error){
 
-);
+console.log(error);
+
+}
 
 }
 
 // =========================
-// SEARCH HISTORY
+// BACKGROUND
+// =========================
+
+function changeBackground(day){
+
+document.body.classList.remove(
+"clear-bg",
+"rain-bg",
+"cloud-bg"
+);
+
+const weather =
+day.weather[0].main;
+
+if(weather === "Clear"){
+
+document.body.classList.add("clear-bg");
+
+}
+
+if(weather === "Rain"){
+
+document.body.classList.add("rain-bg");
+
+}
+
+if(weather === "Clouds"){
+
+document.body.classList.add("cloud-bg");
+
+}
+
+}
+
+// =========================
+// HISTORY
 // =========================
 
 function saveSearch(city){
@@ -559,8 +612,168 @@ JSON.stringify(history)
 
 }
 
+function loadHistory(){
+
+const box =
+document.getElementById("historyBox");
+
+let history =
+
+JSON.parse(
+localStorage.getItem("weatherHistory")
+) || [];
+
+box.innerHTML = "";
+
+history.reverse().slice(0,5)
+.forEach(city => {
+
+box.innerHTML += `
+
+<button
+class="btn btn-outline-light history-btn"
+onclick="searchHistory('${city}')"
+>
+
+${city}
+
+</button>
+
+`;
+
+});
+
+}
+
+function searchHistory(city){
+
+document.getElementById("cityInput")
+.value = city;
+
+getWeather();
+
+}
+
 // =========================
-// ENTER KEY SEARCH
+// GEOLOCATION
+// =========================
+
+function getLocationWeather(){
+
+const locationBtn =
+document.querySelector(".btn-success");
+
+locationBtn.innerHTML = "⏳";
+
+if(!navigator.geolocation){
+
+alert("Geolocation not supported");
+
+locationBtn.innerHTML = "📍";
+
+return;
+
+}
+
+navigator.geolocation.getCurrentPosition(
+
+async(position)=>{
+
+try{
+
+const lat =
+position.coords.latitude;
+
+const lon =
+position.coords.longitude;
+
+const response =
+await fetch(
+
+`https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${apiKey}&units=metric`
+
+);
+
+const data =
+await response.json();
+
+document.getElementById("cityInput")
+.value = data.name;
+
+locationBtn.innerHTML = "📍";
+
+getWeather();
+
+}
+catch(error){
+
+console.log(error);
+
+alert("Unable to fetch location weather");
+
+locationBtn.innerHTML = "📍";
+
+}
+
+},
+
+(error)=>{
+
+locationBtn.innerHTML = "📍";
+
+if(error.code === 1){
+
+alert("Location permission denied");
+
+}
+
+else if(error.code === 2){
+
+alert("Location unavailable");
+
+}
+
+else if(error.code === 3){
+
+alert("Location request timeout");
+
+}
+
+else{
+
+alert("GPS error");
+
+}
+
+},
+
+{
+
+enableHighAccuracy:true,
+
+timeout:10000,
+
+maximumAge:0
+
+}
+
+);
+
+}
+// =========================
+// THEME
+// =========================
+
+function toggleTheme(){
+
+document.body.classList.toggle(
+"light-mode"
+);
+
+}
+
+// =========================
+// ENTER KEY
 // =========================
 
 document
@@ -579,11 +792,12 @@ getWeather();
 // AUTO LOAD
 // =========================
 
-window.onload = () => {
+window.onload = ()=>{
 
-document
-.getElementById("cityInput")
+document.getElementById("cityInput")
 .value = "Jhansi";
+
+loadHistory();
 
 getWeather();
 
